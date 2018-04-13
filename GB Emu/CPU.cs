@@ -30,6 +30,7 @@ namespace GB_Emu
             }
         }
 
+        //PUSH & POP... what to say
         public void PUSH(ushort value)
         {
             SP-=2;
@@ -58,6 +59,7 @@ namespace GB_Emu
 
         }
 
+        //Gets ready?
         public void GetReady()
         {
             memory.bios = System.IO.File.ReadAllBytes("BIOS GB.gb");
@@ -69,6 +71,7 @@ namespace GB_Emu
             byte opcode = memory[PC];
             if (memory.InBios)
             {
+                //Skips instruction 0xFA in bios - checksum of ROM.
                 if (PC == 0xFA) { PC += 2; return 0; }
             }
             int time = instructionTable[opcode].Opcode(this);
@@ -83,6 +86,7 @@ namespace GB_Emu
             }
             if (memory.specialRegister.LCDC.LCDDisplayEnable)
                 display.Step(time);
+            //Temporary
             //memory.specialRegister.LY.Value = (byte)display.line;
             memory.specialRegister.STAT.ModeFlag = (SpecialRegisters.STATClass.Mode)display.mode;
             if (memory.specialRegister.LYC == memory.specialRegister.LY) memory.specialRegister.STAT.CoincidenceFlag = true;
@@ -219,6 +223,7 @@ namespace GB_Emu
         }
         #endregion
 
+        //Carry calculator?
         public static bool GetCarry16(int num)
         {
             return num > 0xFFFF;
@@ -262,6 +267,7 @@ namespace GB_Emu
             PC = (ushort)(POP()-1);
         }
 
+        //Opcode tables
         public static Instruction[] instructionTable = new Instruction[]{
             new Instruction(opcode00,"nop",0),new Instruction(opcode01,"ld bc, %2",2),new Instruction(opcode02,"ld (bc), a",0),new Instruction(opcode03,"inc bc",0),new Instruction(opcode04,"inc b",0),new Instruction(opcode05,"dec b",0),new Instruction(opcode06,"ld b, %1",1),new Instruction(opcode07,"rlc a",0),new Instruction(opcode08,"ld (%2), sp",2),new Instruction(opcode09,"add hl, bc",0),new Instruction(opcode0A,"ld a, (bc)",0),new Instruction(opcode0B,"dec bc",0),new Instruction(opcode0C,"inc c",0),new Instruction(opcode0D,"dec c",0),new Instruction(opcode0E,"ld c, %1",1),new Instruction(opcode0F,"rrc a",0),
             new Instruction(opcode10,"stop",0),new Instruction(opcode11,"ld de, %2",2),new Instruction(opcode12,"ld (de), a",0),new Instruction(opcode13,"inc de",0),new Instruction(opcode14,"inc d",0),new Instruction(opcode15,"dec d",0),new Instruction(opcode16,"ld d, %1",1),new Instruction(opcode17,"rl a",0),new Instruction(opcode18,"jr %1",1),new Instruction(opcode19,"add hl, de",0),new Instruction(opcode1A,"ld a, (de)",0),new Instruction(opcode1B,"dec de",0),new Instruction(opcode1C,"inc e",0),new Instruction(opcode1D,"dec e",0),new Instruction(opcode1E,"ld e, %1",1),new Instruction(opcode1F,"rr a",0),
@@ -309,13 +315,16 @@ namespace GB_Emu
             return instructionTable[MEM[address]];
         }
 
+
+        //Opcode CBxx
         public static int opcodeCB(CPU c)
         {
             c.PC++;
             byte opcode = c.memory[c.PC];
             return instructionCBTable[opcode].Opcode(c);
         }
-
+        
+        //Shitton of opcodes
         #region Opcodes
         #region 8-Bit Loads
         #region LD nn,n
